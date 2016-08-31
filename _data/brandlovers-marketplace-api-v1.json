@@ -18,7 +18,7 @@
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Sucess! Server received your request and will start background processing."
+                        "description": "Success! Server received your request and will start background processing."
                     },
                     "400": {
                         "description": "Bad Request."
@@ -27,7 +27,7 @@
                         "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
                     }
                 },
-                "description": "This enpoint to creates new products in the Marketplace using `skuSellerId` as a primary key. This enpoint expects a json document with array of products. The server will load each product as an individual item that can be manipulated using your own `skuSellerId`. All requests to This endpoint are idenpontent with respect of the `skuSellerId`, this means that once a `skuSellerId` is created it cannot be re-created using this tool. In order to update use the PUT method with the correct `skuSellerId`. You can also use the POST /product to create a single product per request",
+                "description": "This endpoint is meant to create new products in BrandLovers' Marketplace using `skuSellerId` as a primary key. This endpoint expects a JSON document with an array of products. The server will load each product as an individual item that can be manipulated using your own `skuSellerId`. All requests to This endpoint are idenpontent with respect of the `skuSellerId`, this means that once a `skuSellerId` is created it cannot be re-created using this tool. In order to update use the PUT method with the correct `skuSellerId`. You can also use the POST /product to create a single product per request",
                 "tags": [
                     "products"
                 ],
@@ -48,7 +48,7 @@
                     },
                     {
                         "in": "body",
-                        "description": "JSON with a list of new products to be updloaded to the platform",
+                        "description": "JSON with a list of new products to be uploaded to the platform",
                         "name": "products",
                         "required": true,
                         "schema": {
@@ -142,7 +142,7 @@
                 "tags": [
                     "product"
                 ],
-                "summary": "Returns details of a single product using the seller `skuSellerId`",
+                "summary": "Returns details of a single product using the seller's `skuSellerId`",
                 "produces": [
                     "application/json"
                 ],
@@ -236,7 +236,7 @@
           "post": {
               "responses": {
                   "200": {
-                      "description": "Sucess! Server received your request and will start background processing."
+                      "description": "Success! Server received your request and will start background processing."
                   },
                   "400": {
                       "description": "Bad Request."
@@ -249,7 +249,7 @@
               "tags": [
                   "product"
               ],
-              "summary": "Create a new product to the marketplace",
+              "summary": "Create a new product on the marketplace",
               "produces": [
                   "application/json"
               ],
@@ -1437,7 +1437,7 @@
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Sucess!"
+                        "description": "Success!"
                     },
                     "400": {
                         "description": "Bad request."
@@ -1490,7 +1490,7 @@
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Sucess!"
+                        "description": "Success!"
                     },
                     "400": {
                         "description": "Bad request."
@@ -1543,7 +1543,7 @@
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Sucess!"
+                        "description": "Success!"
                     },
                     "400": {
                         "description": "Bad request."
@@ -1596,7 +1596,7 @@
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Sucess!"
+                        "description": "Success!"
                     },
                     "400": {
                         "description": "Bad request."
@@ -1986,7 +1986,7 @@
                 },
                 "skuSellerId": {
                     "type": "string",
-                    "description": "When applicabe will include `skuSellerId` related to this error"
+                    "description": "When applicable will include `skuSellerId` related to this error"
                 }
             }
         },
