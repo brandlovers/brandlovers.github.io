@@ -1,0 +1,3549 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "BrandLovers Marketplace API V1",
+        "description": "Allows sellers to: 1) Load products definitions to the BrandLovers marktplace. 2) Receive and update orders status. 3) Receive and update shipping information. 4) Receive and update customer tickets. All requests consume and return application/json content. All request must be authenticated and use HTTPS.",
+        "version": "1.0.0"
+    },
+    "host": "api.brandlovers.com",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/marketplace/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/products": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucess! Server received your request and will start background processing."
+                    },
+                    "400": {
+                        "description": "Bad Request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "This enpoint to creates new products in the Marketplace using `skuSellerId` as a primary key. This enpoint expects a json document with array of products. The server will load each product as an individual item that can be manipulated using your own `skuSellerId`. All requests to This endpoint are idenpontent with respect of the `skuSellerId`, this means that once a `skuSellerId` is created it cannot be re-created using this tool. In order to update use the PUT method with the correct `skuSellerId`. You can also use the POST /product to create a single product per request",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Allows new products from the seller to be loaded into the marketplace",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "JSON with a list of new products to be updloaded to the platform",
+                        "name": "products",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    }
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetProductsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                          "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Get a list of my products loaded into the Marketplace. This dosen't means that products are eligible for sale, just that they are loaded in the database.",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Returns a list of products loaded into BrandLovers Marketplace",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "security": [
+                  {
+                    "authorization": []
+                  }
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number of items to retun. Defaults to 100. Max alowed is 200. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/product/{skuSellerId}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetProduct"
+                        }
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    },
+                    "404": {
+                        "description": "Object not found. In general this means a invalid skuSellerId."
+                    }
+                },
+                "description": "Returns detailed information of a single product with the seller `skuSellerId`. This service will return a json document with product detail, status, price, invetory among other infomarion availble in the Brand Lovers marketplace",
+                "tags": [
+                    "product"
+                ],
+                "summary": "Returns details of a single product using the seller `skuSellerId`",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "security": [
+                  {
+                    "authorization": []
+                  }
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "SKU ID do Lojista.",
+                        "name": "skuSellerId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    },
+                    "404": {
+                        "description": "Object not found."
+                    }
+                },
+                "description": "Update a single product information such as name, brand, attribute, dimension, etc. Please note that data from your request will be merged with existing data. This allows you to easliy update only certain fields without the need to re-inform the other unchanged fields. For example in order to update just the field `title` simply send just this field with new information, remaining fields will not be changed. In order to erase an item the field must be informed as its default value, for example in order to erase the `videos` field must be sent as videos:[]. The `skuSellerId` field is always mandatory in the path and in the product json Object.",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Update product details",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "security": [
+                  {
+                    "authorization": []
+                  }
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Product Id (SKU) in the seller system that will be updated.",
+                        "name": "skuSellerId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "New product information.",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductUpdate"
+                        }
+                    }
+                ]
+            }
+        },
+        "/product": {
+          "post": {
+              "responses": {
+                  "200": {
+                      "description": "Sucess! Server received your request and will start background processing."
+                  },
+                  "400": {
+                      "description": "Bad Request."
+                  },
+                  "401": {
+                      "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                  }
+              },
+              "description": "Use this enpoint to create a single new product to the Marketplace. This enpoint expects a json document with one product. If you whant to upload multiple products in a single API call use POST /products method. The server will load each product as an individual item that can be manipulated using your own `skuSellerId`. This system is idenpontent, this means that once a `skuSellerId` is created it cannot be re-created using this tool. In order to update, edit a product use the PUT method with the correct reference to your `skuSellerId`",
+              "tags": [
+                  "product"
+              ],
+              "summary": "Create a new product to the marketplace",
+              "produces": [
+                  "application/json"
+              ],
+              "consumes": [
+                  "application/json"
+              ],
+              "parameters": [
+                  {
+                      "in": "header",
+                      "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                      "name": "authorization",
+                      "type": "string",
+                      "required": true
+                  },
+                  {
+                      "in": "body",
+                      "description": "New Produt that will be create",
+                      "name": "product",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/Product"
+                      }
+                  }
+              ]
+          }
+        },
+        "/products/status": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success fetching results.",
+                        "schema": {
+                            "$ref": "#/definitions/GetSellerProductsStatus"
+                        }
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list with seller products status. Please note that this endpoint will not return all details of each product, just the skuSellerId and status. Also please note that this endpoint will return 250 products per call. For full details of a given procuct use GET /product/{skuSellerId}",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Returns seller products status in the marketplace",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number of items to return in this query. Defaults to 250. Maximum 1000. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Bulk enable/disable products in the marketplace. This endpoint requires an array of objects with the seller SKU `skuSellerId` and boolean value that defines if the product is enabled or not for sale. This endpoint can be used to set a single product or many products.",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Bulk enable/disable products in the marketplace",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "List of seller products with new status information",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ProductStatusUpdate"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/products/prices": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Allows bulk update of product prices. This endpoint expects a json document with an array of products with the `skuSellerId` and the new price. Server will process each new product update individually and will ackwlodge as much updates as possible, even if a single product update fails. After this request you can query product final status with GET /product/status",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Allows bulk update of product prices.",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "Data for bulk product price update",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SellerItemPrices"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/products/stocks": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Bulk product stock update. This endpoint expect a array of products `skuSellerId` with new inventory data",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Bulk product stock update",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "Array of product SKUs.",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ProductStock"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "/product/{skuSellerId}/status": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Update product status in the Marketplace. Set to `true` to enable, `false` to disable sale.",
+                "tags": [
+                    "product"
+                ],
+                "summary": "Enable/disable a single product in the Marketplace",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Product Id (SKU) in the seller system",
+                        "name": "skuSellerId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "Seller SKU that will be enabled or disabled",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SellerItemStatus"
+                        }
+                    }
+                ]
+            }
+        },
+        "/product/{skuSellerId}/stock": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Update a single product inventory information. Products with zero stock will not be eligible for sale.",
+                "tags": [
+                    "product"
+                ],
+                "summary": "Update a single prouduc stock",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Product Id (SKU) in the seller system that will be updated",
+                        "name": "skuSellerId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "New product inventory information",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Stock"
+                        }
+                    }
+                ]
+            }
+        },
+        "/product/{skuSellerId}/prices": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    }
+                },
+                "description": "Allows seller to set the SKU prices (MSRP and/or offer price). All prices must be informed in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. Same as $1,2345.67 must be informed solely as 1234567",
+                "tags": [
+                    "product"
+                ],
+                "summary": "Allows seller to update prices of a single SKU",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Product SKU",
+                        "name": "skuSellerId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "JSON document with the SKU price",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductPrice"
+                        }
+                    }
+                ]
+            }
+        },
+        "/products/status/selling": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetProductsStatusSelling"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns products that are successfully listed for sale.",
+                "tags": [
+                    "products"
+                ],
+                "summary": "Returns products that are successfully listed for sale.",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Retuns a list of orders associated with this seller. The list is ordered by dateCreated.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns orders details",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/shipments/delivered": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Bulk update of order shipments status. This alows to inform multiple shipments status",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Bulk update of order shipments",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "JSON body with list of shipments to be updated.",
+                        "name": "ordersshipments",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/OrdersShipments"
+                        }
+                    }
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrdersShipments"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns list of shipments. By default this will return list of the last shipments ordered by dateCreated, folowed by last update date.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns list of shipments",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Query by shippment status.",
+                        "name": "status",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/shipments/shipped": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Allows bulk updates of orders shippments.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Bulk update of order shipments",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "description": "JSON payload with list of shippments of orders.",
+                        "name": "ordersshipments",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/OrdersShipments"
+                        }
+                    }
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrdersShipments"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of shipments shipped. By Default returns items ordered by dateCreated folowed by last update",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list of shipments shipped",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Product status.",
+                        "name": "status",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "NEW",
+                            "APPROVED",
+                            "DECLINED",
+                            "PENDING"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/approved": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of approved orders. Orders in the `approved` state must be fullfiled imediadetelly.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Return list of approved orders",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 100, max 200. Use this in conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/canceled": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list with canceled orders. Canceled orders should not be fullfiled.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns lists of canceled orders",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Default 100, max 250. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "default": 100,
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/delivered": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of orders successfully delivered associated with this seller.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list of orders successfully delivered associated with this seller.",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/new": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of orders flagged as new. New orders should not be fullfiled until marketplace flags them as approved.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list of orders flagged as new.",
+
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 100. Max 250. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "default": 100,
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/partiallyDelivered": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of partially deliverd orders. This is a list of orders with items shipped but with not all items ackwlodged as deliverd",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list of partially deliverd orders",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 100. Max 250. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "default": 100,
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/partiallySent": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list of orders that contain one (or more) items that where not shipped. This will list the entire order as well the items with peding shipment. Use this service to track orders that need to be fullfiled.",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list of orders partially fullfiled",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 100. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/orders/status/sent": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetOrders"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    }
+                },
+                "description": "Returns a list with orders completely fullfiled, this means orders with all items sent. Orders will ordered by dateCreated fowllowed by last update",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Returns a list with orders fully sent",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "Returns all details of a single order, including last status, items shipped or not.",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Returns all details of a order",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Id of this order.",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}/shipment/cancel": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "success."
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "Confirm shipment canceletion (when requested by the customer) or failure to deliver one shipment",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Confirm shipment canceletion (when requested by the customer) or failure to deliver",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewTrackingRefund"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Order Id",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}/shipment/delivered": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucess!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "Confirms that a shipment was delivered. Must inform quantity of successfully deliverd items even if items deliverd was less than the original order",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Confirms that a shipment was delivered",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Newshipmentstatus"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Order Id",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}/shipment/exchange": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucess!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "This enpoint to confirm item exchange when failure to deliver or requested by the customer. All customer requests are tracket via trouble tickets",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Confirm item exchange",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewTrackingRefund"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Order Id",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}/shipment/return": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucess!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "Use this endpoint to return and refund items froma a order. In order to fully return an order list all items and applicate quantity.",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Confirm order item return and refund",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewTrackingRefund"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "description": "Order unique Id",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/order/{orderId}/shipment/sent": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Sucess!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "404": {
+                        "description": "Object not found. Was not able to find orderId"
+                    }
+                },
+                "description": "Updates order to include shipment shiped information. This endpoint can be used to include a single or multiple shipments for any give order. In order to inform that all items of a order where shipped list all of them, including applicable quantities in the payload.",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Update new order to include shipment information",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Newshipmentstatus"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "description": "Unique Order Id",
+                        "name": "orderId",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/tickets": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetTickets"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    }
+                },
+                "description": "Allows seller to receive and status, queries, requests and complaints from customers. As well related messages",
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Get customers trouble tickets",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "description": "Query by trouble ticket status",
+                        "name": "status",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "OPEN",
+                            "REOPENED",
+                            "CLOSED"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/ticket": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    }
+                },
+                "description": "Use this service to create a new trouble ticket. Use this to include relevant information about the order, comunicate with the customer or marketplace team. Whenever possible message will be pushed to Mobile first. This is the primary mean of comunicaiton with the customer regarding orders, shippments, shippments status. New tickets will be automatically be set to 'OPEN'. Trouble tickets need to be associated with a orderId or customer. New tickets can optionally include a new message.",
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Creates a new trouble ticket",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "description": "JSON object with new trouble ticket",
+                        "name": "newTicket",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewTicket"
+                        }
+                    }
+                ]
+            }
+        },
+        "/ticket/{ticketId}/messages": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success!",
+                        "schema": {
+                            "$ref": "#/definitions/GetTicketMessages"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Access denied. You can only access your trouble tickets"
+                    }
+                },
+                "description": "Returns trouble ticket history with all messages exchanged. Only tickets related to your seller will be returned. Attempt to read other tickets will return 403 (acess denied).",
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Get trouble ticket messages",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Trouble ticket ID.",
+                        "name": "ticketId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to skip when executing query. List starts at zero. If omitted will default to zero. Use this conjuction with `limit` to paginate across the results.",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "description": "Number or items to return when executing query. Defaults to 10. Use this conjuction with `offset` to paginate across the results.",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ]
+            }
+        },
+        "/ticket/{ticketId}/message": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success!"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "404": {
+                        "description": "Object not found."
+                    }
+                },
+                "description": "Add a new message to this trouble ticket. Messages can be `CUSTOMER` (customer will be able to see it) or `INTERNAL`.",
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Add new message to trouble ticket",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Trouble ticket ID.",
+                        "name": "ticketId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "New message object to append to trouble ticket.",
+                        "name": "message",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewTicketMessage"
+                        }
+                    }
+                ]
+            }
+        },
+        "/ticket/{ticketId}/status": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "successfully received transaction"
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Access denied. You're not authenticated or token expired. Check your request header the `authorization` field is required."
+                    },
+                    "403": {
+                        "description": "Server refused to process your request. Please check the API SLA and reduce number of requests per second."
+                    },
+                    "404": {
+                        "description": "Object not found."
+                    }
+                },
+                "description": "Alows the seller to update the status of a trouble ticket",
+                "tags": [
+                    "tickets"
+                ],
+                "summary": "Update trouble ticket status",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "description": "Authorization token. The Authorization token can be found in your Admin console.",
+                        "name": "authorization",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "description": "Trouble ticket unique identification",
+                        "name": "ticketId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "description": "New trouble ticket status",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TicketStatus"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "securityDefinitions": {
+        "authorization": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "authorization",
+            "description": "Authorization token. The Authorization token can be found in your Admin console."
+        }
+    },
+    "tags": [
+        {
+            "name": "products",
+            "description": "Bulk create or query seller products."
+        },
+        {
+            "name": "product",
+            "description": "Create, Modify or Read details of a single product"
+        },
+        {
+            "name": "orders",
+            "description": "Bulk create or query orders"
+        },
+        {
+            "name": "order",
+            "description": "Modify or read details of a single order"
+        },
+        {
+            "name": "tickets",
+            "description": "Bulk create or query customer tickets"
+        },
+        {
+            "name": "ticket",
+            "description": "Modify or read details of a single ticket"
+        }
+    ],
+    "definitions": {
+        "Metadata": {
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "description": "JSON attribute key"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "JSON object value"
+                }
+            }
+        },
+        "Error": {
+            "required": [
+                "type",
+                "message"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Error type"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Friendly message describing the error"
+                },
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "When applicabe will include `skuSellerId` related to this error"
+                }
+            }
+        },
+        "GetProductsResponse": {
+            "properties": {
+                "skus": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/GetProduct"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    },
+                    "description": "Payload with response"
+                }
+            }
+        },
+        "Product": {
+            "required": [
+                "skuSellerId",
+                "title",
+                "description",
+                "brand",
+                "price",
+                "categories",
+                "stock",
+                "images",
+                "attributes"
+            ],
+            "properties": {
+                "productId": {
+                    "type": "string",
+                    "description": "Brand Lovers Product ID. Use this to suggest a product association. This field is optional."
+                },
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "productGroupId": {
+                    "type": "string",
+                    "description": "Unique Product Group ID. Products with the same `productGroupId` will be grouped and displayed as a unique entry. Use `productGroupId` to group diferent SKUs that represent diferent colors, sizes, capacities, etc.."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Product name as advertised by manufacturer. This how the product will be displayed in the Marketplace"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Product description."
+                },
+                "brand": {
+                    "type": "string",
+                    "description": "Brand name"
+                },
+                "gtin": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of product EAN and/or ISBN and/or ASIN codes"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of categories associated with this product"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of valid Product image URLs. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "videos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of videos de URLs associated with this product. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "price": {
+                    "$ref": "#/definitions/ProductPrice"
+                },
+                "stock": {
+                    "type": "integer",
+                    "description": "Number of products availble for sale from the seller. Each new successfull order will automatically reduce the number of products available."
+                },
+                "dimensions": {
+                    "$ref": "#/definitions/Dimensions"
+                },
+                "giftWrap": {
+                    "$ref": "#/definitions/GiftWrap"
+                },
+                "attributes": {
+                    "type": "array",
+                    "description": "List of `key` `value` attributes of this product. This is very important for search and SEO optmization. Include all relevant information",
+                    "items": {
+                        "$ref": "#/definitions/ProductAttribute"
+                    }
+                }
+            }
+        },
+        "ProductUpdate": {
+          "required": [
+              "skuSellerId"
+          ],
+            "properties": {
+                "productId": {
+                    "type": "string",
+                    "description": "Brand Lovers Product Id. Use this to recommend a product association"
+                },
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "productGroupId": {
+                    "type": "string",
+                    "description": "Unique Product Group ID. Products with the same `productGroupId` will be grouped and displayed as a unique entry. Use `productGroupId` to group diferent SKUs that represent diferent colors, sizes, capacities, etc.."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Product name as advertised by manufacturer. This how the product will be displayed in the Marketplace"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Product text description."
+                },
+                "brand": {
+                    "type": "string",
+                    "description": "Brand name"
+                },
+                "gtin": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of product EAN and/or ISBN and/or ASIN codes"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of categories associated with this product"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of valid Product image URLs. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "videos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of videos de URLs associated with this product. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "price": {
+                    "$ref": "#/definitions/ProductPrice"
+                },
+                "stock": {
+                    "type": "integer",
+                    "description": "Number of products availble for sale from the seller. Each new successfull order will automatically reduce the number of products available."
+                },
+                "dimensions": {
+                    "$ref": "#/definitions/Dimensions"
+                },
+                "giftWrap": {
+                    "$ref": "#/definitions/GiftWrap"
+                },
+                "attributes": {
+                    "type": "array",
+                    "description": "List of `key` `value` attributes of this product. This is very important for search and SEO optmization. Include all relevant information",
+                    "items": {
+                        "$ref": "#/definitions/ProductAttribute"
+                    }
+                }
+            }
+        },
+        "GetProduct": {
+            "required": [
+                "skuSellerId",
+                "title",
+                "description",
+                "brand",
+                "price",
+                "categories",
+                "attributes",
+                "stock",
+                "images",
+                "status"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "productGroupId": {
+                    "type": "string",
+                    "description": "Unique Product Group ID. Products with the same `productGroupId` will be grouped and displayed as a unique entry. Use `productGroupId` to group diferent SKUs that represent diferent colors, sizes, capacities, etc.."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Product name as advertised by manufacturer. This how the product will be displayed in the Marketplace"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Product text description."
+                },
+                "brand": {
+                    "type": "string",
+                    "description": "Brand name"
+                },
+                "gtin": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of product EAN and/or ISBN and/or ASIN codes"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of categories associated with this product"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of valid Product image URLs. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "videos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of videos de URLs associated with this product. HTTP or HTTPS are valid. HTTPS is prefered."
+                },
+                "price": {
+                    "$ref": "#/definitions/ProductPrice"
+                },
+                "stock": {
+                    "type": "integer",
+                    "description": "Number of products availble for sale from the seller. Each new successfull order will automatically reduce the number of products available."
+                },
+                "dimensions": {
+                    "$ref": "#/definitions/Dimensions"
+                },
+                "giftWrap": {
+                    "$ref": "#/definitions/GiftWrap"
+                },
+                "attributes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProductAttribute"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Product status"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Error"
+                    }
+                }
+            }
+        },
+        "ProductAttribute": {
+            "required": [
+                "name",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Attribute name"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "Attribute value"
+                }
+            }
+        },
+        "Dimensions": {
+            "required": [
+                "weight",
+                "length",
+                "width",
+                "height"
+            ],
+            "properties": {
+                "weight": {
+                    "type": "integer",
+                    "description": "Product weight in Grams. No commas or periods are accepeted. For example one killo must be informed as 1000. Another example 1 Kilo and 234 grams should be informed solely as 1234"
+                },
+                "length": {
+                    "type": "integer",
+                    "description": "Product length in millimeters. No commas or periods are accepeted. For example one meter produc must be informed as 1000. Another example 1 meter and 23 centimeters should be informed solely as 1230"
+                },
+                "width": {
+                    "type": "integer",
+                    "description": "Product width in millimeters. No commas or periods are accepeted. For example one meter produc must be informed as 1000. Another example 1 meter and 23 centimeters should be informed solely as 1230"
+                },
+                "height": {
+                    "type": "integer",
+                    "description": "Product height in millimeters. No commas or periods are accepeted. For example one meter produc must be informed as 1000. Another example 1 meter and 23 centimeters should be informed solely as 1230"
+                }
+            }
+        },
+        "GiftWrap": {
+            "required": [
+                "available",
+                "value"
+            ],
+            "properties": {
+                "available": {
+                    "type": "boolean",
+                    "description": "Flag that defines if this product is eligible for giftwrapping"
+                },
+                "value": {
+                    "type": "integer",
+                    "description": "Amount charged for gift wrap. All prices must be provided in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "messageSupport": {
+                    "type": "boolean",
+                    "description": "Flag that defines if seller supports giftwrapp with a message"
+                }
+            }
+        },
+        "GetOrdersShipments": {
+            "properties": {
+                "shipments": {
+                    "type": "array",
+                    "description": "Order Shippment Status",
+                    "items": {
+                        "$ref": "#/definitions/OrderShippmentStatus"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    },
+                    "description": "Response payload"
+                }
+            }
+        },
+        "OrderShippmentStatus": {
+            "properties": {
+                "shipmentId": {
+                    "type": "string",
+                    "description": "Shippment unique Id"
+                },
+                "trackingUrl":{
+                  "type": "string",
+                  "description": "Courier tracking URL"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OrderItemReference"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Shipment status"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Error"
+                    }
+                }
+            }
+        },
+        "OrdersShipments": {
+            "properties": {
+                "shipments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OrderShippment"
+                    }
+                }
+            }
+        },
+        "OrderShippment": {
+            "properties": {
+                "order": {
+                    "type": "string",
+                    "description": "Order unique Id"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OrderItemReference"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Shipment status."
+                },
+                "occurredAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date that this shippment was shiped"
+                },
+                "trackingUrl": {
+                    "type": "string",
+                    "description": "Courier tracking URL"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Courier unique trackign Id associated with this shipment"
+                },
+                "sellerShipmentId": {
+                    "type": "string",
+                    "description": "Unique Seller shipment Id. This must be unique across all orders and shipments"
+                },
+                "cte": {
+                    "type": "string",
+                    "description": "Conhecimento de Transporte Eletôniconico"
+                },
+                "courier": {
+                    "$ref": "#/definitions/Courier"
+                },
+                "invoice": {
+                    "$ref": "#/definitions/Invoice"
+                }
+            }
+        },
+        "OrderItemReference": {
+            "required": [
+                "skuSellerId",
+                "quantity"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system. This is the key that defines witch product will be updated"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "description": "Quantity of items"
+                }
+            }
+        },
+        "GetSellerProductsStatus": {
+            "properties": {
+                "skus": {
+                    "type": "array",
+                    "description": "Status of the products from the seller",
+                    "items": {
+                        "$ref": "#/definitions/GetSellerProductStatus"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    },
+                    "description": "Response payload"
+                }
+            }
+        },
+        "GetSellerProductStatus": {
+            "required": [
+                "skuSellerId",
+                "status",
+                "price",
+                "stock"
+              ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system."
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Product status in the marketplace"
+                },
+                "price": {
+                    "$ref": "#/definitions/ProductPrice"
+                },
+                "stock": {
+                    "type": "integer",
+                    "description": "Number of products availble for sale from the seller. Each new successfull order will automatically reduce the number of products available."
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Error"
+                    }
+                }
+            }
+        },
+        "ProductStatusUpdate": {
+            "required": [
+                "skuSellerId",
+                "active"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Seller product unique Id that will be updated"
+                },
+                "active": {
+                    "type": "boolean",
+                    "description": "Defines if this product is ready for sale. Active `true`, disabled `false`"
+                }
+            }
+        },
+        "SellerItemStatus": {
+            "required": [
+                "active"
+            ],
+            "properties": {
+                "active": {
+                    "type": "boolean",
+                    "description": "Defines if this product is ready for sale. Active `true`, disabled `false` "
+                }
+            }
+        },
+        "SellerItemPrices": {
+            "required": [
+                "skuSellerId",
+                "price"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique product Id from seller that will be updated"
+                },
+                "price": {
+                    "$ref": "#/definitions/ProductPrice"
+                }
+            }
+        },
+        "ProductPrice": {
+            "required": [
+                "default",
+                "offer"
+            ],
+            "properties": {
+                "default": {
+                    "type": "integer",
+                    "description": "List price, also known as MSRP (Manufacturer Suggest Retail Price) or the recommended retail price (RRP). All prices must be provided in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "offer": {
+                    "type": "integer",
+                    "description": "Product price. This is what will be offered to the customer. All prices must be provided in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                }
+            }
+        },
+        "ProductStock": {
+            "required": [
+                "skuSellerId",
+                "stocks"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "stocks": {
+                    "type": "array",
+                    "description": "Invetory information",
+                    "items": {
+                        "$ref": "#/definitions/Stock"
+                    }
+                }
+            }
+        },
+        "Stock": {
+            "required": [
+                "quantity"
+            ],
+            "properties": {
+                "quantity": {
+                    "type": "integer",
+                    "description": "Stock available"
+                },
+                "crossDockingTime": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Time it will take to manufacture, prepare or setup this product. Time must be provided in seconds. For example 1 day should be informed as 86400. This time will be included in the product ETA informed to the customer"
+                }
+            }
+        },
+        "Courier": {
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Courier name"
+                },
+                "taxID": {
+                    "type": "string",
+                    "description": "Courier taxId information. For example CNPJ"
+                }
+            }
+        },
+        "Invoice": {
+            "required": [
+                "number",
+                "serie",
+                "accessKey"
+            ],
+            "properties": {
+                "cnpj": {
+                    "type": "string",
+                    "description": "CNPJ responsável pelo envio dos produtos. Pode ser diferente caso a empresa possua diversos Centros de Distribuição (CDs)"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Número da Nota Fiscal"
+                },
+                "serie": {
+                    "type": "string",
+                    "description": "Número de serie da Nota Fiscal"
+                },
+                "issuedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data de emissão da Nota Fiscal"
+                },
+                "accessKey": {
+                    "type": "string",
+                    "description": "Número da chave de acesso à nota fiscal. A chave possui 44 dígitos e contém todas as informações da DANFE"
+                },
+                "linkXml": {
+                    "type": "string",
+                    "description": "Url para consulta da NFE"
+                },
+                "linkDanfe": {
+                    "type": "string",
+                    "description": "Url para consulta da DANFE"
+                }
+            }
+        },
+        "GetProductsStatusSelling": {
+            "required": [
+                "sellerItems",
+                "metadata"
+            ],
+            "properties": {
+                "sellerItems": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SellerItem"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    }
+                }
+            }
+        },
+        "SellerItem": {
+            "required": [
+                "skuSellerId",
+                "title",
+                "brand",
+                "status",
+                "prices",
+                "stocks",
+                "attributes",
+                "product",
+                "images",
+                "dimensions"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Product name as advertised by manufacturer. This how the product will be displayed in the Marketplace"
+                },
+                "brand": {
+                    "type": "string",
+                    "description": "Brand name"
+                },
+                "gtin": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Array of product EAN and/or ISBN and/or ASIN codes"
+                },
+                "status": {
+                    "type": "array",
+                    "description": "Product status for each marketplace that this product is listed",
+                    "items": {
+                        "$ref": "#/definitions/SellerItemStatus"
+                    }
+                },
+                "prices": {
+                    "type": "array",
+                    "description": "Price information for each marketplace that this product is listed",
+                    "items": {
+                        "$ref": "#/definitions/ProductPrice"
+                    }
+                },
+                "stocks": {
+                    "type": "array",
+                    "description": "Invetory information for each marketplace that this product is listed",
+                    "items": {
+                        "$ref": "#/definitions/ControlledStock"
+                    }
+                },
+                "urls": {
+                    "type": "array",
+                    "description": "List of URLs where the product is listed for sale",
+                    "items": {
+                        "$ref": "#/definitions/ProductSiteReference"
+                    }
+                },
+                "images": {
+                    "type": "array",
+                    "description": "List of valid Product image URLs.",
+                    "items": {
+                        "$ref": "#/definitions/Image"
+                    }
+                },
+                "product": {
+                    "$ref": "#/definitions/ProductReference"
+                },
+                "dimensions": {
+                    "$ref": "#/definitions/Dimensions"
+                },
+                "giftWrap": {
+                    "$ref": "#/definitions/GiftWrap"
+                },
+                "attributes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProductAttribute"
+                    }
+                }
+            }
+        },
+        "ProductReference": {
+            "required": [
+                "id",
+                "href"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "ID do recurso"
+                },
+                "href": {
+                    "type": "string",
+                    "description": "Link para acesso ao recurso"
+                }
+            }
+        },
+        "ControlledStock": {
+            "required": [
+                "quantity"
+            ],
+            "properties": {
+                "quantity": {
+                    "type": "integer",
+                    "description": "Quantity of product available for sale"
+                },
+                "reserved": {
+                    "type": "integer",
+                    "description": "Locked product invetory for orders that are not approved and are not ready to fullfil."
+                },
+                "crossDockingTime": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Time it will take to manufacture, prepare or setup this product. Time must be provided in seconds. For example 1 day should be informed as 86400. This time will be included in the ETA informed to the customer"
+                }
+            }
+        },
+        "Image": {
+            "required": [
+                "type",
+                "main",
+                "url"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Image format"
+                },
+                "main": {
+                    "type": "boolean",
+                    "description": "Sets as main image"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "Image URL"
+                }
+            }
+        },
+        "ProductSiteReference": {
+            "required": [
+                "url",
+                "skuSellerId"
+            ],
+            "properties": {
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Seller unique product Id"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "Link do produto no site"
+                }
+            }
+        },
+        "GetOrders": {
+            "required": [
+                "orders",
+                "metadata"
+            ],
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Order"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    }
+                }
+            }
+        },
+        "Order": {
+            "required": [
+                "orderId",
+                "orderMarketplaceId",
+                "createdAt",
+                "updatedAt",
+                "status",
+                "totalAmount",
+                "totalItemsAmount",
+                "totalShippingAmount",
+                "totalDiscountAmount",
+                "freight",
+                "customer",
+                "billingAddress",
+                "items",
+                "shippingAddress",
+                "shipments"
+            ],
+            "properties": {
+                "orderId": {
+                    "type": "string",
+                    "description": "Unique order Id (related to this seller)"
+                },
+                "orderMarketplaceId": {
+                    "type": "string",
+                    "description": "Unique Order Id that will be displayed to the customer. This Id is not the same as `orderId`"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date that this order was created"
+                },
+                "approvedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date that this order was approved for fullfilment"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Last update data of this order"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Order status"
+                },
+                "totalAmount": {
+                    "type": "integer",
+                    "description": "Order total in cents, this is what the customer will be charged for. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "totalItemsAmount": {
+                    "type": "integer",
+                    "description": "Order items total amount in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "totalShippingAmount": {
+                  "type": "integer",
+                  "description": "Total shipments amount items. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "totalDiscountAmount": {
+                    "type": "integer",
+                    "description": "Total order discounts in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "billingAddress": {
+                    "$ref": "#/definitions/Address"
+                },
+                "customer": {
+                    "$ref": "#/definitions/Customer"
+                },
+                "freight": {
+                    "$ref": "#/definitions/Freight"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OrderItem"
+                    }
+                },
+                "shippingAddress": {
+                    "$ref": "#/definitions/Address"
+                },
+                "shipments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Shippment"
+                    }
+                },
+                "seller": {
+                    "$ref": "#/definitions/Seller"
+                }
+            }
+        },
+        "Seller": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Seller unique Id in the Brand Lovers Marketplace"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Seller name in the Brand Lovers Marketplace"
+                }
+            }
+        },
+        "Customer": {
+            "required": [
+                "id",
+                "name",
+                "documentNumber",
+                "type",
+                "phones"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Customer unqiue Id"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Customer Name"
+                },
+                "documentNumber": {
+                    "type": "string",
+                    "description": "Customer tax information"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Customer type: Enterprise or Consumer"
+                },
+                "email": {
+                    "type": "string",
+                    "description": "Customer Email (when available). Please note: Email is not a mandatory field"
+                },
+                "phones": {
+                    "type": "array",
+                    "description": "Customer phone number",
+                    "items": {
+                        "$ref": "#/definitions/Phone"
+                    }
+                }
+            }
+        },
+        "Phone": {
+            "required": [
+                "number",
+                "type"
+            ],
+            "properties": {
+                "number": {
+                    "type": "string",
+                    "description": "Phone number"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Phone number type, home, office, mobile, etc"
+                }
+            }
+        },
+        "OrderItem": {
+            "required": [
+                "id",
+                "skuSellerId",
+                "name",
+                "freight",
+                "salePrice",
+                "sent"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique Id representing this item"
+                },
+                "skuSellerId": {
+                    "type": "string",
+                    "description": "Unique Product Id (SKU) in the seller system"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Product name"
+                },
+                "salePrice": {
+                    "type": "integer",
+                    "description": "Product unit price"
+                },
+                "sent": {
+                    "type": "boolean",
+                    "description": "Flag if product was already shipped"
+                },
+                "freight": {
+                    "$ref": "#/definitions/Freight"
+                },
+                "giftWrap": {
+                    "$ref": "#/definitions/OrderGiftWrap"
+                },
+                "promotions": {
+                    "type": "array",
+                    "description": "Promotions array",
+                    "items": {
+                        "$ref": "#/definitions/Promotion"
+                    }
+                }
+            }
+        },
+        "Promotion": {
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Promotion unique idenfitcation number"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Promotion name"
+                },
+                "amount": {
+                    "type": "integer",
+                    "description": "Total discount in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Promotion type"
+                }
+            }
+        },
+        "OrderGiftWrap": {
+            "required": [
+                "available",
+                "value"
+            ],
+            "properties": {
+                "available": {
+                    "type": "boolean",
+                    "description": "Defines if giftwrpping is available for this product."
+                },
+                "value": {
+                    "type": "integer",
+                    "description": "Amount charged for gift wrap. All prices must be provided in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. $1,2345.67 should be informed solely as 1234567"
+                },
+                "messageSupport": {
+                    "type": "boolean",
+                    "description": "Defines if giftwrpping is available for this product."
+                },
+                "giftCard": {
+                    "$ref": "#/definitions/GiftCard"
+                }
+            }
+        },
+        "GiftCard": {
+            "required": [
+                "from",
+                "to",
+                "message"
+            ],
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "description": "Giftcard `from` field"
+                },
+                "to": {
+                    "type": "string",
+                    "description": "Giftcard `to` field"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Giftcard `body` message"
+                }
+            }
+        },
+        "Freight": {
+            "required": [
+                "defaultAmount",
+                "chargedAmount",
+                "transitTime",
+                "crossDockingTime",
+                "additionalInfo"
+            ],
+            "properties": {
+                "defaultAmount": {
+                    "type": "integer",
+                    "description": "Default value of this shippment."
+                },
+                "chargedAmount": {
+                    "type": "integer",
+                    "description": "Shipment cost. Must be informed in cents. No commas or periods are accepeted. For example one dollar should be informed as 100. Same as $1,2345.67 must be informed solely as 1234567"
+                },
+                "transitTime": {
+                    "type": "integer",
+                    "description": "Deliver time in seconds. Time must be provided in seconds. For example 1 day should be informed as 86400. This time will be included in the product ETA informed to the customer"
+                },
+                "crossDockingTime": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Time it will take to manufacture, prepare or setup this product. Time must be provided in seconds. For example 1 day should be informed as 86400. This time will be included in the product ETA informed to the customer"
+                },
+                "additionalInfo": {
+                    "type": "string",
+                    "description": "Aditional information for the courier"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Freight type"
+                },
+                "ETA": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Estimated time of arrival"
+                },
+                "scheduledPeriod": {
+                    "type": "string",
+                    "description": "Scheduled period"
+                }
+            }
+        },
+        "Shippment": {
+            "required": [
+                "items",
+                "status",
+                "occurredAt",
+                "sellerShipmentId",
+                "invoice",
+                "courier"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "List of items of this shippment",
+                    "items": {
+                        "$ref": "#/definitions/OrderItemReference"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Shipment status"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Additinal shipment tracking information"
+                },
+                "occurredAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date time when this shippment happened"
+                },
+                "trackingUrl": {
+                    "type": "string",
+                    "description": "Courier tracking URL"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Courier unique trackign Id associated with this shipment"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Shipment Id associated with this shippment used to group diferent item or items from a single order"
+                },
+                "sellerShipmentId": {
+                    "type": "string",
+                    "description": "Unique Seller shipment Id. This must be unique across all orders and shipments"
+                },
+                "cte": {
+                    "type": "string",
+                    "description": "Conhecimento de Transporte Eletrônico"
+                },
+                "courier": {
+                    "$ref": "#/definitions/Courier"
+                },
+                "invoice": {
+                    "$ref": "#/definitions/Invoice"
+                }
+            }
+        },
+        "Newshipmentstatus": {
+            "required": [
+                "items",
+                "occurredAt",
+                "sellerShipmentId",
+                "courier",
+                "invoice"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of Order IDs of this items from this order that will be updated in this shipment"
+                },
+                "occurredAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data da ocorrência"
+                },
+                "trackingUrl": {
+                    "type": "string",
+                    "description": "Courier tracking URL"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Unique id shipment Id in the courier system"
+                },
+                "sellerShipmentId": {
+                    "type": "string",
+                    "description": "Unique Seller shipment Id. This must be unique across all orders and shipmnents"
+                },
+                "cte": {
+                    "type": "string",
+                    "description": "Conhecimento do Transporte Eletrônico"
+                },
+                "courier": {
+                    "$ref": "#/definitions/Courier"
+                },
+                "invoice": {
+                    "$ref": "#/definitions/Invoice"
+                }
+            }
+        },
+        "NewTrackingRefund": {
+            "required": [
+                "items",
+                "info"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/OrderItemReference"
+                    }
+                },
+                "info": {
+                    "type": "string",
+                    "description": "Aditional information about this shippment"
+                },
+                "occurredAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date time that this was created"
+                },
+                "tranckingUrl": {
+                    "type": "string",
+                    "description": "Courier tracking URL"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Tracking Id in the courier"
+                },
+                "sellerShipmentId": {
+                    "type": "string",
+                    "description": "Unique Seller shipment Id. This must be unique across all orders and shipments"
+                },
+                "cte": {
+                    "type": "string",
+                    "description": "Conhecimento do Transporte Eletrônico"
+                },
+                "courier": {
+                    "$ref": "#/definitions/Courier"
+                }
+            }
+        },
+        "Address": {
+            "required": [
+                "address",
+                "number",
+                "complement",
+                "neighbourhood",
+                "city",
+                "state",
+                "countryId",
+                "zipCode"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "description": "Address first line (ave, street name, etc..)"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "Address number"
+                },
+                "complement": {
+                    "type": "string",
+                    "description": "Complementary info (aptartament number, building name, suite)"
+                },
+                "neighbourhood": {
+                    "type": "string",
+                    "description": "Address neighbourhood"
+                },
+                "reference": {
+                    "type": "string",
+                    "description": "Pontos de referência"
+                },
+                "city": {
+                    "type": "string",
+                    "description": "City"
+                },
+                "state": {
+                    "type": "string",
+                    "description": "State"
+                },
+                "countryId": {
+                    "type": "string",
+                    "description": "Contry code using aplpha ISO-3166, Example: BR, US, AR, GB, CN"
+                },
+                "zipCode": {
+                    "type": "string",
+                    "description": "Zip Code"
+                },
+                "recipientName": {
+                    "type": "string",
+                    "description": "Recipient Name"
+                }
+            }
+        },
+        "NewTicket": {
+            "required": [
+                "orderId",
+                "from",
+                "body",
+                "type"
+            ],
+            "properties": {
+                "orderId": {
+                    "type": "string",
+                    "description": "Unique order Id that this trouble ticket belongs to"
+                },
+                "from": {
+                    "type": "string",
+                    "description": "Friendly name of the person sending this message, if not provided the seller `name` will be used"
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Message to the customer"
+                },
+                "message":{
+                    "$ref": "#/definitions/NewTicketMessage"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Trouble ticket type."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Trouble ticked brief description"
+                },
+                "customer": {
+                    "$ref": "#/definitions/CustomerReference"
+                }
+            }
+        },
+        "GetTickets": {
+            "properties": {
+                "tickets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Ticket"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    }
+                }
+            }
+        },
+        "Ticket": {
+            "properties": {
+                "ticketId": {
+                    "type": "string",
+                    "description": "Trouble Ticket unique identification Id"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Trouble Ticket status. 'OPEN','CLOSED','REOPENED'"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Trouble ticket type."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Trouble ticked brief description"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date time that ticket was created"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date-time with last update of this ticket"
+                },
+                "closedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date-time when ticket was closed"
+                },
+                "priority": {
+                    "type": "string",
+                    "description": "Trouble ticket priority"
+                },
+                "customer": {
+                    "$ref": "#/definitions/CustomerReference"
+                },
+                "subject": {
+                    "type": "string",
+                    "description": "Short one line title describing ticket."
+                },
+                "sla": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date-time with a promisse for the customer when this ticket will be resolved"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    }
+                }
+            }
+        },
+        "CustomerReference": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Customer name"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "description": "Customer phone mumber"
+                }
+            }
+        },
+        "NewTicketMessage": {
+            "required": [
+                "visibility",
+                "body"
+            ],
+            "properties": {
+                "visibility": {
+                    "type": "string",
+                    "description": "Defines if this message is `CUSTOMER` (customer will receive a copy) or `INTERNAL`"
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Message text"
+                }
+            }
+        },
+        "GetTicketMessages": {
+            "required": [
+                "metadata"
+            ],
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TicketMessage"
+                    }
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Metadata"
+                    }
+                }
+            }
+        },
+        "TicketMessage": {
+            "required": [
+                "createdAt",
+                "id",
+                "body",
+                "visibility"
+            ],
+            "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date created"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Trouble Ticket Id."
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Message text"
+                },
+                "visibility": {
+                    "type": "string",
+                    "description": "Defines if this message is `CUSTOMER` (customer will receive a copy) or `INTERNAL`"
+                }
+            }
+        },
+        "TicketStatus": {
+            "required": [
+                "ticketStatus"
+            ],
+            "properties": {
+                "ticketStatus": {
+                    "type": "string",
+                    "description": "New trouble ticket status. Valid options are `REOPENED`, `CLOSED`"
+                }
+            }
+        }
+    }
+}
